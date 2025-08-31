@@ -45,49 +45,56 @@
 
   <ItemGroup>
     <PackageReference Include="JotunnLib" Version="2.26.1" />
+    <PackageReference Include="Pfhoenix.Valheim.ModProjectReferences" Version="1.0.23" />
   </ItemGroup>
 
   <PropertyGroup>
     <VALHEIM_MANAGED>$(VALHEIM_INSTALL)/valheim_Data/Managed</VALHEIM_MANAGED>
     <UNITY_FOLDER>$(SolutionDir)JotunnModStubUnity</UNITY_FOLDER>
+    <COPY_DEST>$(TargetDir)</COPY_DEST>
+    <ResolvedCopyDest Condition="'$(COPY_DEST)' != ''">$(COPY_DEST)</ResolvedCopyDest>
+    <ResolvedCopyDest Condition="'$(COPY_DEST)' == '' and '$(TargetDir)' != ''">$(TargetDir)</ResolvedCopyDest>
+    <ResolvedCopyDest Condition="'$(ResolvedCopyDest)' == '' and '$(OutputPath)' != ''">$(OutputPath)</ResolvedCopyDest>
+    <ResolvedCopyDest Condition="'$(ResolvedCopyDest)' == ''">$(MSBuildProjectDirectory)\bin\$(Configuration)\</ResolvedCopyDest>
   </PropertyGroup>
 
-  <Target Name="CopyToUnity">
+  <Target Name="CopyToUnity" Condition="'$(ResolvedCopyDest)' != ''">
     <Message Text="Copy assemblies to Unity" Importance="high" />
-    <Copy SourceFiles="$(BEPINEX_PATH)/core/BepInEx.dll" DestinationFolder="$(UNITY_FOLDER)/Assets/Assemblies" />
-    <Copy SourceFiles="$(BEPINEX_PATH)/core/0Harmony.dll" DestinationFolder="$(UNITY_FOLDER)/Assets/Assemblies" />
-    <Copy SourceFiles="$(BEPINEX_PATH)/core/Mono.Cecil.dll" DestinationFolder="$(UNITY_FOLDER)/Assets/Assemblies" />
-    <Copy SourceFiles="$(BEPINEX_PATH)/core/MonoMod.Utils.dll" DestinationFolder="$(UNITY_FOLDER)/Assets/Assemblies" />
-    <Copy SourceFiles="$(BEPINEX_PATH)/core/MonoMod.RuntimeDetour.dll" DestinationFolder="$(UNITY_FOLDER)/Assets/Assemblies" />
-    <Copy SourceFiles="$(TargetDir)Jotunn.dll" DestinationFolder="$(UNITY_FOLDER)/Assets/Assemblies" />
-    <Copy SourceFiles="$(TargetDir)$(TargetName).dll" DestinationFolder="$(UNITY_FOLDER)/Assets/Assemblies" />
-    <Copy SourceFiles="$(TargetDir)$(TargetName).pdb" DestinationFolder="$(UNITY_FOLDER)/Assets/Assemblies" />
+    <MakeDir Directories="$(ResolvedCopyDest)" />
+    <Copy Condition="Exists('$(BEPINEX_PATH)/core/BepInEx.dll')" SourceFiles="$(BEPINEX_PATH)/core/BepInEx.dll" DestinationFolder="$(ResolvedCopyDest)" />
+    <Copy Condition="Exists('$(BEPINEX_PATH)/core/0Harmony.dll')" SourceFiles="$(BEPINEX_PATH)/core/0Harmony.dll" DestinationFolder="$(ResolvedCopyDest)" />
+    <Copy Condition="Exists('$(BEPINEX_PATH)/core/Mono.Cecil.dll')" SourceFiles="$(BEPINEX_PATH)/core/Mono.Cecil.dll" DestinationFolder="$(ResolvedCopyDest)" />
+    <Copy Condition="Exists('$(BEPINEX_PATH)/core/MonoMod.Utils.dll')" SourceFiles="$(BEPINEX_PATH)/core/MonoMod.Utils.dll" DestinationFolder="$(ResolvedCopyDest)" />
+    <Copy Condition="Exists('$(BEPINEX_PATH)/core/MonoMod.RuntimeDetour.dll')" SourceFiles="$(BEPINEX_PATH)/core/MonoMod.RuntimeDetour.dll" DestinationFolder="$(ResolvedCopyDest)" />
+    <Copy Condition="Exists('$(TargetDir)Jotunn.dll')" SourceFiles="$(TargetDir)Jotunn.dll" DestinationFolder="$(ResolvedCopyDest)" />
+    <Copy SourceFiles="$(TargetDir)$(TargetName).dll" DestinationFolder="$(ResolvedCopyDest)" />
+    <Copy Condition="Exists('$(TargetDir)$(TargetName).pdb')" SourceFiles="$(TargetDir)$(TargetName).pdb" DestinationFolder="$(ResolvedCopyDest)" />
     <!-- mdb generation doesn't work from portable pdbs, which are the only kind supported under Linux -->
     <Copy
       Condition="Exists('$(TargetDir)$(TargetName).dll.mdb')"
       SourceFiles="$(TargetDir)$(TargetName).dll.mdb"
-      DestinationFolder="$(UNITY_FOLDER)/Assets/Assemblies"
+      DestinationFolder="$(ResolvedCopyDest)"
     />
-    <Copy SourceFiles="$(VALHEIM_MANAGED)/Assembly-CSharp.dll" DestinationFolder="$(UNITY_FOLDER)/Assets/Assemblies" />
-    <Copy SourceFiles="$(VALHEIM_MANAGED)/assembly_valheim.dll" DestinationFolder="$(UNITY_FOLDER)/Assets/Assemblies" />
-    <Copy SourceFiles="$(VALHEIM_MANAGED)/assembly_utils.dll" DestinationFolder="$(UNITY_FOLDER)/Assets/Assemblies" />
-    <Copy SourceFiles="$(VALHEIM_MANAGED)/assembly_postprocessing.dll" DestinationFolder="$(UNITY_FOLDER)/Assets/Assemblies" />
-    <Copy SourceFiles="$(VALHEIM_MANAGED)/assembly_sunshafts.dll" DestinationFolder="$(UNITY_FOLDER)/Assets/Assemblies" />
-    <Copy SourceFiles="$(VALHEIM_MANAGED)/assembly_guiutils.dll" DestinationFolder="$(UNITY_FOLDER)/Assets/Assemblies" />
-    <Copy SourceFiles="$(VALHEIM_MANAGED)/assembly_lux.dll" DestinationFolder="$(UNITY_FOLDER)/Assets/Assemblies" />
-    <Copy SourceFiles="$(VALHEIM_MANAGED)/assembly_simplemeshcombine.dll" DestinationFolder="$(UNITY_FOLDER)/Assets/Assemblies" />
-    <Copy SourceFiles="$(VALHEIM_MANAGED)/assembly_googleanalytics.dll" DestinationFolder="$(UNITY_FOLDER)/Assets/Assemblies" />
-    <Copy SourceFiles="$(VALHEIM_MANAGED)/PlayFab.dll" DestinationFolder="$(UNITY_FOLDER)/Assets/Assemblies" />
-    <Copy SourceFiles="$(VALHEIM_MANAGED)/PlayFabParty.dll" DestinationFolder="$(UNITY_FOLDER)/Assets/Assemblies" />
-    <Copy SourceFiles="$(VALHEIM_MANAGED)/Splatform.dll" DestinationFolder="$(UNITY_FOLDER)/Assets/Assemblies" />
-    <Copy SourceFiles="$(VALHEIM_MANAGED)/Splatform.Steam.dll" DestinationFolder="$(UNITY_FOLDER)/Assets/Assemblies" />
-    <Copy SourceFiles="$(VALHEIM_MANAGED)/gui_framework.dll" DestinationFolder="$(UNITY_FOLDER)/Assets/Assemblies" />
-    <Copy SourceFiles="$(VALHEIM_MANAGED)/com.rlabrecque.steamworks.net.dll" DestinationFolder="$(UNITY_FOLDER)/Assets/Assemblies" />
-    <Copy SourceFiles="$(VALHEIM_MANAGED)/SoftReferenceableAssets.dll" DestinationFolder="$(UNITY_FOLDER)/Assets/Assemblies" />
+    <Copy Condition="Exists('$(VALHEIM_MANAGED)/Assembly-CSharp.dll')" SourceFiles="$(VALHEIM_MANAGED)/Assembly-CSharp.dll" DestinationFolder="$(ResolvedCopyDest)" />
+    <Copy Condition="Exists('$(VALHEIM_MANAGED)/assembly_valheim.dll')" SourceFiles="$(VALHEIM_MANAGED)/assembly_valheim.dll" DestinationFolder="$(ResolvedCopyDest)" />
+    <Copy Condition="Exists('$(VALHEIM_MANAGED)/assembly_utils.dll')" SourceFiles="$(VALHEIM_MANAGED)/assembly_utils.dll" DestinationFolder="$(ResolvedCopyDest)" />
+    <Copy Condition="Exists('$(VALHEIM_MANAGED)/assembly_postprocessing.dll')" SourceFiles="$(VALHEIM_MANAGED)/assembly_postprocessing.dll" DestinationFolder="$(ResolvedCopyDest)" />
+    <Copy Condition="Exists('$(VALHEIM_MANAGED)/assembly_sunshafts.dll')" SourceFiles="$(VALHEIM_MANAGED)/assembly_sunshafts.dll" DestinationFolder="$(ResolvedCopyDest)" />
+    <Copy Condition="Exists('$(VALHEIM_MANAGED)/assembly_guiutils.dll')" SourceFiles="$(VALHEIM_MANAGED)/assembly_guiutils.dll" DestinationFolder="$(ResolvedCopyDest)" />
+    <Copy Condition="Exists('$(VALHEIM_MANAGED)/assembly_lux.dll')" SourceFiles="$(VALHEIM_MANAGED)/assembly_lux.dll" DestinationFolder="$(ResolvedCopyDest)" />
+    <Copy Condition="Exists('$(VALHEIM_MANAGED)/assembly_simplemeshcombine.dll')" SourceFiles="$(VALHEIM_MANAGED)/assembly_simplemeshcombine.dll" DestinationFolder="$(ResolvedCopyDest)" />
+    <Copy Condition="Exists('$(VALHEIM_MANAGED)/assembly_googleanalytics.dll')" SourceFiles="$(VALHEIM_MANAGED)/assembly_googleanalytics.dll" DestinationFolder="$(ResolvedCopyDest)" />
+    <Copy Condition="Exists('$(VALHEIM_MANAGED)/PlayFab.dll')" SourceFiles="$(VALHEIM_MANAGED)/PlayFab.dll" DestinationFolder="$(ResolvedCopyDest)" />
+    <Copy Condition="Exists('$(VALHEIM_MANAGED)/PlayFabParty.dll')" SourceFiles="$(VALHEIM_MANAGED)/PlayFabParty.dll" DestinationFolder="$(ResolvedCopyDest)" />
+    <Copy Condition="Exists('$(VALHEIM_MANAGED)/Splatform.dll')" SourceFiles="$(VALHEIM_MANAGED)/Splatform.dll" DestinationFolder="$(ResolvedCopyDest)" />
+    <Copy Condition="Exists('$(VALHEIM_MANAGED)/Splatform.Steam.dll')" SourceFiles="$(VALHEIM_MANAGED)/Splatform.Steam.dll" DestinationFolder="$(ResolvedCopyDest)" />
+    <Copy Condition="Exists('$(VALHEIM_MANAGED)/gui_framework.dll')" SourceFiles="$(VALHEIM_MANAGED)/gui_framework.dll" DestinationFolder="$(ResolvedCopyDest)" />
+    <Copy Condition="Exists('$(VALHEIM_MANAGED)/com.rlabrecque.steamworks.net.dll')" SourceFiles="$(VALHEIM_MANAGED)/com.rlabrecque.steamworks.net.dll" DestinationFolder="$(ResolvedCopyDest)" />
+    <Copy Condition="Exists('$(VALHEIM_MANAGED)/SoftReferenceableAssets.dll')" SourceFiles="$(VALHEIM_MANAGED)/SoftReferenceableAssets.dll" DestinationFolder="$(ResolvedCopyDest)" />
   </Target>
 
   <Target Name="JotunnPostBuildTask" AfterTargets="Build">
-    <CallTarget Targets="CopyToUnity" Condition="Exists('$(UNITY_FOLDER)')" />
+    <CallTarget Targets="CopyToUnity" />
   </Target>
 
   <Target Name="JotunnPostBuildTaskWin" AfterTargets="Build" Condition=" '$(OS)' == 'Windows_NT' ">
